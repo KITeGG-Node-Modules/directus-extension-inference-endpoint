@@ -29,7 +29,8 @@ export function makeLiteLLM({ url, adminKey, fetchFn = fetch }) {
   return {
     // -> { key: 'sk-…' (shown once), token: '<hash>', key_name, expires, … }
     generate: (body) => call('POST', '/key/generate', body),
-    // -> [{ token, key_name, key_alias, expires, created_at, last_active, metadata, user_id }]
+    // -> [{ token, key_name, key_alias, expires, created_at, last_active, metadata, user_id,
+    //      spend, max_budget, budget_duration, budget_reset_at }]
     list: async (userId) => {
       const q = new URLSearchParams({
         user_id: userId,

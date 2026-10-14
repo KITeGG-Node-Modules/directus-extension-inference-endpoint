@@ -8,11 +8,25 @@
 
 export const TIERS = ['student', 'staff', 'admin']
 
-// LiteLLM key fields. Spend-based budgets don't work here: self-hosted
-// models have no price, so spend stays 0. Limit requests and concurrency.
+// LiteLLM key fields. Spend is in GPU-seconds: the prices in LiteLLM's
+// config (kitegg-inference, recipes/litellm-proxy) make cost = GPU-seconds.
+// max_budget is per day and resets at 00:00 UTC. rpm/tpm/parallel stay as
+// guard rails against bursts.
 export const DEFAULT_LIMITS = {
-  student: { rpm_limit: 60, tpm_limit: 200000, max_parallel_requests: 2 },
-  staff: { rpm_limit: 300, tpm_limit: 1000000, max_parallel_requests: 8 },
+  student: {
+    rpm_limit: 60,
+    tpm_limit: 200000,
+    max_parallel_requests: 2,
+    max_budget: 3600,
+    budget_duration: '1d',
+  },
+  staff: {
+    rpm_limit: 300,
+    tpm_limit: 1000000,
+    max_parallel_requests: 8,
+    max_budget: 14400,
+    budget_duration: '1d',
+  },
   admin: {},
 }
 

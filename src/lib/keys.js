@@ -13,6 +13,10 @@ export function publicKey(k) {
     created_at: k.created_at || null,
     expires: k.expires || null,
     last_active: k.last_active || null,
+    // GPU-seconds; LiteLLM writes spend a few seconds after each request
+    spend: k.spend ?? 0,
+    max_budget: k.max_budget ?? null,
+    budget_reset_at: k.budget_reset_at || null,
   }
 }
 

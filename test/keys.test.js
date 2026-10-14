@@ -95,6 +95,8 @@ describe('inference key endpoints', () => {
       user_id: 'u-ann',
       duration: '180d',
       rpm_limit: 60,
+      max_budget: 3600,
+      budget_duration: '1d',
     })
     expect(sent.metadata).toMatchObject({
       source: 'llp',
@@ -141,6 +143,7 @@ describe('inference key endpoints', () => {
     const sent = llm.keys.get(out.id).body
     expect(sent).not.toHaveProperty('duration')
     expect(sent).not.toHaveProperty('rpm_limit')
+    expect(sent).not.toHaveProperty('max_budget')
     expect(out.label).toBe('Kurs KI-Design')
     expect(
       (await h.listKeys(ctx(boss, 'HS Trier / Management'))).keys
