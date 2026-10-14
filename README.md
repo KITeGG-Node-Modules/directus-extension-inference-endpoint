@@ -49,13 +49,13 @@ curl $LITELLM/key/generate -H "Authorization: Bearer $MASTER" -H 'Content-Type: 
   -d '{"user_id":"llp-service","key_alias":"llp-issuer"}'
 ```
 
-A `proxy_admin` key can manage every key on the proxy, so keep the admin API off the public route: route only `/v1` (and later `/tasks`) to LiteLLM from outside.
+A `proxy_admin` key can manage every key on the proxy, so keep the admin API off the public route: route only `/v1` to LiteLLM from outside.
 
 ### LiteLLM facts this relies on
 
 Checked against LiteLLM 1.105 (`test/litellm.integration.test.js`):
 
-- a `proxy_admin` user's key can `/key/generate`, `/key/list`, `/key/info` and `/key/delete`; a normal key gets 401 on those;
+- a `proxy_admin` user's key can `/key/generate`, `/key/list`, `/key/info` and `/key/delete`; a normal key gets 401/403 on the first three and can read `/key/info` only for itself;
 - `/key/delete` accepts the hashed token, and the key stops working immediately;
 - key-level `tags` are Enterprise-only, so the tier goes into `metadata` (`source: "llp"`, `tier`, `email`, `label`).
 
