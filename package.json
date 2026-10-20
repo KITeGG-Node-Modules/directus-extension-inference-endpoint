@@ -3,7 +3,6 @@
   "description": "Directus custom endpoint that issues personal LiteLLM API keys for the KITeGG inference service",
   "icon": "key",
   "version": "1.0.0",
-  "private": true,
   "keywords": [
     "directus",
     "directus-extension",
