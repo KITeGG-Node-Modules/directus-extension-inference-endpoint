@@ -9,6 +9,9 @@
     "directus-custom-endpoint"
   ],
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "directus:extension": {
     "type": "endpoint",
     "path": "dist/index.js",

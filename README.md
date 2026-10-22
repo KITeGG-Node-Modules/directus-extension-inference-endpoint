@@ -67,5 +67,5 @@ Checked against LiteLLM 1.105 (`test/litellm.integration.test.js`):
 npm install
 npm test          # unit tests; the integration test is skipped
 LITELLM_TEST_URL=http://localhost:4000 LITELLM_TEST_ADMIN_KEY=sk-… npm test
-npm run build     # dist/ is committed: the Directus image installs from GitHub
+npm run build     # dist/ is not committed: CI builds it when a tag is pushed and publishes it to the GitLab npm registry
 ```
