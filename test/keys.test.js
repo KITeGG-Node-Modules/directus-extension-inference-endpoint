@@ -101,6 +101,7 @@ describe('inference key endpoints', () => {
     expect(sent.metadata).toMatchObject({
       source: 'llp',
       tier: 'student',
+      institution: 'hst',
       email: 'ann@hs-trier.de',
     })
     const listed = await h.listKeys(ctx(ann, 'HS Trier / Student'))
