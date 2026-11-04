@@ -32,6 +32,6 @@
     "vitest": "^5.0.4"
   },
   "dependencies": {
-    "kitegg-directus-extension-common": "github:KITeGG-Node-Modules/kitegg-directus-extension-common#b62cf971c7d3fafa03239a967522c0663c855226"
+    "kitegg-directus-extension-common": "github:KITeGG-Node-Modules/kitegg-directus-extension-common#466a81baf6efe700339df67aa5f51078e545837e"
   }
 }
