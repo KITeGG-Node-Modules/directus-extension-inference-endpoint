@@ -11,6 +11,7 @@ All under `/inference`, behind the usual `baseRequestHandler` login.
 | `GET` | `/keys` | your active keys (never the secret, but with today's `spend`, `max_budget` and `budget_reset_at`), your tier, its limits and the public base URL |
 | `POST` | `/keys` | create a key; returns the secret **once**. Body: `{ "replace": true }` to swap your existing key; admins also `{ "label": "…", "expires_in_days": 0–3650 }` (0 = never) |
 | `DELETE` | `/keys/:keyId` | revoke a key by its id (LiteLLM's hashed token). Your own; admins may revoke any key issued here |
+| any | `/v1/…` | the LLP playground: forwards a fixed list of `/v1` calls (models, chat, images, embeddings, decisions, videos) to LiteLLM with the playground key, so the browser never holds one. Its own login check instead of `baseRequestHandler`, which asks Keycloak on every call |
 
 ## Who gets what
 
@@ -35,6 +36,7 @@ The daily budget is LiteLLM's per-key `max_budget` with `budget_duration: "1d"`.
 | `INFERENCE_PUBLIC_URL` | base URL shown to users, e.g. `https://inference.kitegg.de/v1` (optional) |
 | `INFERENCE_KEY_DURATION_DAYS` | default 180 |
 | `INFERENCE_TIER_LIMITS` | optional JSON override, e.g. `{"student":{"rpm_limit":30}}` |
+| `INFERENCE_PLAYGROUND_KEY` | normal LiteLLM key for `/v1/…` (below); without it that route answers 503 |
 
 Without URL and key the endpoints answer 503.
 
@@ -50,6 +52,19 @@ curl $LITELLM/key/generate -H "Authorization: Bearer $MASTER" -H 'Content-Type: 
 ```
 
 A `proxy_admin` key can manage every key on the proxy, so keep the admin API off the public route: route only `/v1` to LiteLLM from outside.
+
+### The playground key
+
+One normal key, not an admin one, so it can only call `/v1`. Every forwarded call carries the user's Directus id in `X-OpenWebUI-User-Id`, which the door maps to LiteLLM's `customer`, so spend is logged and can be limited per person. The key's own limits cap the playground as a whole:
+
+```sh
+curl $LITELLM/user/new -H "Authorization: Bearer $MASTER" -H 'Content-Type: application/json' \
+  -d '{"user_id":"llp-playground","user_alias":"LLP playground"}'
+curl $LITELLM/key/generate -H "Authorization: Bearer $MASTER" -H 'Content-Type: application/json' \
+  -d '{"user_id":"llp-playground","key_alias":"llp-playground","rpm_limit":600,"max_parallel_requests":16,"max_budget":36000,"budget_duration":"1d","metadata":{"source":"llp","tier":"playground"}}'
+```
+
+The budget is GPU-seconds like the personal keys' (36000 = 10 GPU-hours a day for everyone together).
 
 ### LiteLLM facts this relies on
 

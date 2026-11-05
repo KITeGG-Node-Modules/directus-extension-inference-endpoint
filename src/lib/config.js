@@ -9,6 +9,10 @@ export const litellmUrl = (process.env.INFERENCE_LITELLM_URL || '').replace(
 // Not the master key: it can be revoked and rotated on its own.
 export const litellmAdminKey = process.env.INFERENCE_LITELLM_ADMIN_KEY || ''
 
+// Normal (not admin) key the LLP playground's calls go out with, via
+// /inference/v1/*. Give it rpm and parallel limits of its own.
+export const playgroundKey = process.env.INFERENCE_PLAYGROUND_KEY || ''
+
 // Base URL shown to users next to their key, e.g. https://inference.kitegg.de/v1
 export const publicBaseUrl = process.env.INFERENCE_PUBLIC_URL || null
 
