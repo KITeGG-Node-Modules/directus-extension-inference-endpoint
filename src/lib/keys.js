@@ -35,6 +35,7 @@ export function ownKeys(keys, now = Date.now()) {
 export function planCreate({
   user,
   tier,
+  institution = null,
   existing,
   body = {},
   durationDays,
@@ -75,7 +76,13 @@ export function planCreate({
   const request = {
     user_id: user.id,
     key_alias: `${SOURCE}/${user.email || user.id}/${suffix}`,
-    metadata: { source: SOURCE, tier, email: user.email || null, label },
+    metadata: {
+      source: SOURCE,
+      tier,
+      institution,
+      email: user.email || null,
+      label,
+    },
     ...limitsFor(tier, limitsOverride),
   }
   if (days > 0) request.duration = `${days}d`

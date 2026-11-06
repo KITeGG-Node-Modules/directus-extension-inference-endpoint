@@ -8,6 +8,18 @@
 
 export const TIERS = ['student', 'staff', 'admin']
 
+// Institution display name -> short code. Mirror of INSTITUTIONS in
+// kitegg-llp-www src/access/roles.js. The code goes into the key's metadata,
+// where the inference door turns it into a Prometheus label (usage per school).
+export const INSTITUTION_CODES = {
+  'HfG Offenbach': 'hfgo',
+  'HfG Schwäbisch Gmünd': 'hfgg',
+  'HS Mainz': 'hsm',
+  'HS Trier': 'hst',
+  KISD: 'kisd',
+  External: 'ext',
+}
+
 // LiteLLM key fields. Spend is in GPU-seconds: the prices in LiteLLM's
 // config (kitegg-inference, recipes/litellm-proxy) make cost = GPU-seconds.
 // max_budget is per day and resets at 00:00 UTC. rpm/tpm/parallel stay as
@@ -52,4 +64,13 @@ export function limitsFor(tier, override = '') {
     }
   }
   return { ...DEFAULT_LIMITS[tier], ...extra }
+}
+
+// "<Institution> / <Role>" -> short code. null without a role or for
+// Administrator (belongs to no school); 'other' for an institution we don't know,
+// so a new one shows up in the metrics instead of vanishing.
+export function institutionFor(roleName) {
+  if (typeof roleName !== 'string' || !roleName.includes(' / ')) return null
+  const name = roleName.split(' / ')[0].trim()
+  return INSTITUTION_CODES[name] || 'other'
 }

@@ -1,6 +1,6 @@
 import { LiteLLMError } from '../lib/litellm.js'
 import { ownKeys, planCreate, publicKey } from '../lib/keys.js'
-import { limitsFor, tierFor } from '../lib/tiers.js'
+import { institutionFor, limitsFor, tierFor } from '../lib/tiers.js'
 
 // Handlers for /inference/keys. `client` is a makeLiteLLM() instance and
 // `settings` the values from config.js; both injected so tests need no network.
@@ -15,7 +15,12 @@ export function makeKeyHandlers(client, settings) {
       fields: ['id', 'email', 'role.name'],
     })
     const tier = tierFor(me?.role?.name, req.accountability?.admin)
-    return { me: { id: user.id, email: me?.email || user.email }, tier }
+    const institution = institutionFor(me?.role?.name)
+    return {
+      me: { id: user.id, email: me?.email || user.email },
+      tier,
+      institution,
+    }
   }
 
   function fail(res, err) {
@@ -47,11 +52,12 @@ export function makeKeyHandlers(client, settings) {
 
     async createKey(ctx) {
       try {
-        const { me, tier } = await whoami(ctx)
+        const { me, tier, institution } = await whoami(ctx)
         const existing = ownKeys(await client.list(me.id))
         const plan = planCreate({
           user: me,
           tier,
+          institution,
           existing,
           body: ctx.req.body || {},
           durationDays: settings.durationDays,

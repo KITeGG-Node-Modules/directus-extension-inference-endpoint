@@ -23,6 +23,8 @@ The tier comes from the Directus role name (`<Institution> / <Role>`):
 | staff | `/ Staff` | 1 | 4 GPU-hours/day (14400), 300 req/min, 1M tokens/min, 8 parallel |
 | admin | `/ Management`, Administrator | up to 20, with label and own expiry | none |
 
+The institution (`hfgo`, `hfgg`, `hsm`, `hst`, `kisd`, `ext`; `other` for one not in `INSTITUTION_CODES`, none for Administrator) is the part of the role name before the slash. It is written into the key's metadata next to the tier, and the inference door exposes `tier`, `institution` and `label` as Prometheus labels, so usage can be grouped by role and school. Keys issued before this carry no institution until their metadata is updated; LiteLLM replaces the whole `metadata` field on update, so an update must send all of it.
+
 Keys expire after 180 days; the account page offers a new one. Nobody has a key until they ask for one.
 
 The daily budget is LiteLLM's per-key `max_budget` with `budget_duration: "1d"`. LiteLLM counts it in dollars; here one "dollar" is one GPU-second, because the model prices in LiteLLM's config are set so that cost = GPU-seconds. Those prices live in the kitegg-inference repo (`recipes/litellm-proxy`), not here. The budget resets at 00:00 UTC; over budget, requests get 422 until then. Spend is written a few seconds after each request, so the account page lags slightly.
@@ -72,7 +74,7 @@ Checked against LiteLLM 1.105 (`test/litellm.integration.test.js`):
 
 - a `proxy_admin` user's key can `/key/generate`, `/key/list`, `/key/info` and `/key/delete`; a normal key gets 401/403 on the first three and can read `/key/info` only for itself;
 - `/key/delete` accepts the hashed token, and the key stops working immediately;
-- key-level `tags` are Enterprise-only, so the tier goes into `metadata` (`source: "llp"`, `tier`, `email`, `label`).
+- key-level `tags` are Enterprise-only, so the tier goes into `metadata` (`source: "llp"`, `tier`, `institution`, `email`, `label`).
 
 ## Develop
 
@@ -80,5 +82,5 @@ Checked against LiteLLM 1.105 (`test/litellm.integration.test.js`):
 npm install
 npm test          # unit tests; the integration test is skipped
 LITELLM_TEST_URL=http://localhost:4000 LITELLM_TEST_ADMIN_KEY=sk-… npm test
-npm run build     # dist/ is committed: the Directus image installs from GitHub
+npm run build     # dist/ is not committed: CI builds it when a tag is pushed and publishes it to the GitLab npm registry
 ```
